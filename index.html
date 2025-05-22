@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6B46C1',
+                        secondary: '#9F7AEA',
+                        success: '#48BB78',
+                        warning: '#F6AD55',
+                        danger: '#F56565',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-primary px-6 py-4 shadow-lg">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-microchip text-white text-2xl"></i>
+                <h1 class="text-white text-xl font-bold">Sensor Dashboard</h1>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-gray-600 text-sm font-semibold">Temperature</h2>
+                <p class="text-3xl font-bold text-gray-800"><span id="temperature">--</span></p>
+                <p class="text-sm text-gray-500 mt-2">Current Reading</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-gray-600 text-sm font-semibold">Humidity</h2>
+                <p class="text-3xl font-bold text-gray-800"><span id="humidity">--</span></p>
+                <p class="text-sm text-gray-500 mt-2">Current Reading</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-gray-600 text-sm font-semibold">Gas Level</h2>
+                <p class="text-3xl font-bold text-gray-800"><span id="gas_level">--</span></p>
+                <p class="text-sm text-gray-500 mt-2">Current Reading</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-gray-600 text-sm font-semibold">Distance</h3>
+                <p class="text-3xl font-bold text-gray-800"><span id="distance">--</span></p>
+                <p class="text-sm text-gray-500 mt-2">Current Reading</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-gray-600 font-semibold mb-4">Heart Rate Metrics</h2>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500">Pulse Value</p>
+                        <p class="text-2xl font-bold text-gray-800"><span id="pulse_value">--</span></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">BPM</p>
+                        <p class="text-2xl font-bold text-gray-800"><span id="bpm">--</span></p>
+                    </div>
+                    <i class="fas fa-heartbeat text-4xl text-red-500"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-gray-600 font-semibold text-lg mb-4">AI Analysis (Last 10 Seconds)</h2>
+                <div id="ai_analysis" class="text-lg">
+                    <p class="text-gray-500">Status: <span id="status">Loading...</span></p>
+                    <p class="text-gray-500">Temperature: <span id="ai_temp">--</span> °C</p>
+                    <p class="text-gray-500">Humidity: <span id="ai_humidity">--</span> %</p>
+                    <p class="text-gray-500">Gas Level: <span id="ai_gas_level">--</span></p>
+                    <p class="text-gray-500">Pulse Value: <span id="ai_pulse_value">--</span></p>
+                </div>
+            </div>
+        </div>
+                <!-- Motion Sensors -->
+                <div class="bg-white rounded-lg shadow-md p-8 transition-transform transform hover:scale-105">
+                    <h2 class="text-gray-600 font-semibold mb-4">Motion Sensors</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-sm text-gray-500 mb-2">Accelerometer</h4>
+                            <p class="text-sm">X: <span id="accel_x" class="font-semibold">--</span></p>
+                            <p class="text-sm">Y: <span id="accel_y" class="font-semibold">--</span></p>
+                            <p class="text-sm">Z: <span id="accel_z" class="font-semibold">--</span></p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm text-gray-500 mb-2">Gyroscope</h4>
+                            <p class="text-sm">X: <span id="gyro_x" class="font-semibold">--</span></p>
+                            <p class="text-sm">Y: <span id="gyro_y" class="font-semibold">--</span></p>
+                            <p class="text-sm">Z: <span id="gyro_z" class="font-semibold">--</span></p>
+                        </div>
+                    </div>
+                </div>
+    </div>
+    <script>
+        function fetchAIAnalysis() {
+            fetch('/ai_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ai_temp').textContent = data.temperature.toFixed(2);
+                    document.getElementById('ai_humidity').textContent = data.humidity.toFixed(2);
+                    document.getElementById('ai_gas_level').textContent = data.gas_level.toFixed(2);
+                    document.getElementById('ai_pulse_value').textContent = data.pulse_value.toFixed(2);
+                    document.getElementById('status').textContent = data.status;
+                })
+                .catch(error => console.error("Error fetching AI analysis:", error));
+        }
+
+        setInterval(fetchAIAnalysis, 10000);
+        fetchAIAnalysis();
+    </script>
+</body>
+</html>
+
+    <script>
+       function fetchData() {
+    fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('temperature').textContent = data.temperature + '°C';
+            document.getElementById('humidity').textContent = data.humidity + '%';
+            document.getElementById('gas_level').textContent = data.gas_level;
+            document.getElementById('distance').textContent = data.distance + ' cm';
+            document.getElementById('pulse_value').textContent = data.pulse_value;
+            document.getElementById('bpm').textContent = data.bpm;
+            document.getElementById('accel_x').textContent = data.accel_x;
+            document.getElementById('accel_y').textContent = data.accel_y;
+            document.getElementById('accel_z').textContent = data.accel_z;
+            document.getElementById('gyro_x').textContent = data.gyro_x;
+            document.getElementById('gyro_y').textContent = data.gyro_y;
+            document.getElementById('gyro_z').textContent = data.gyro_z;
+
+            // Call the fall detection function with the accelerometer data
+            detectFall(data.accel_x, data.accel_y, data.accel_z);
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
+
+// Fetch data every second
+setInterval(fetchData, 1000); // Fetch 
+    </script>
+    
+    <!-- JavaScript to fetch and display AI results -->
+    <script>
+        function fetchAIAnalysis() {
+            fetch('/ai_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ai_temp').textContent = data.temperature.toFixed(2);
+                    document.getElementById('ai_humidity').textContent = data.humidity.toFixed(2);
+                    document.getElementById('ai_gas_level').textContent = data.gas_level.toFixed(2);
+                    document.getElementById('ai_pulse_value').textContent = data.pulse_value.toFixed(2);
+                    document.getElementById('status').textContent = data.status;
+                })
+                .catch(error => console.error("Error fetching AI analysis:", error));
+        }
+
+        // Fetch AI analysis every 10 seconds
+        setInterval(fetchAIAnalysis, 10000);  // 10 seconds
+        fetchAIAnalysis();  // Fetch immediately on load
+    </script>
+</body>
+</html>
