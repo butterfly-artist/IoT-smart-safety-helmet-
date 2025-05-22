@@ -1,4 +1,6 @@
 # IoT-smart-safety-helmet-for coal miners
+# Open the esp123.ino file in the Arduino IDE, compile the code, and successfully upload it to the ESP32 microcontroller. Create a dedicated folder named temple and store the index.html file within it. Additionally, set up a separate folder named __pycache__ and place sensor_data.cpython-313.pyc inside it. Ensure that the exchangeable wire for the smart safety helmet is properly connected before proceeding.
+
 	Software requirement: 
 VS code: VS Code is a computer program where we write the code for our smart helmet's "brain" (ESP32). It helps us organize, write, and test the code to make our helmet work safely.
 
